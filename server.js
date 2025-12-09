@@ -1,13 +1,19 @@
-const express = require("express");
+    const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// CONNECT TO MONGODB (Render uses environment variable)
-mongoose.connect(process.env.MONGO_URI, {
+// ===================== CONNECT TO MONGODB =====================
+
+// Use environment variable from Render
+const MONGO_URI = process.env.MONGO_URI;
+
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -20,7 +26,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // CONTACT SCHEMA
 const contactSchema = new mongoose.Schema({
     name: String,
-    roll: String,
+    roll: String,      
     email: String,
     message: String,
     date: { type: Date, default: Date.now }
@@ -29,35 +35,33 @@ const contactSchema = new mongoose.Schema({
 // MODEL
 const Contact = mongoose.model("Contact", contactSchema);
 
-// POST API — STORE CONTACT MESSAGE
+// POST API — STORE CONTACT FORM DATA
 app.post("/api/contact", async (req, res) => {
     try {
-        const { name, rollNumber, email, message } = req.body;
+        const { name, roll, email, message } = req.body;
 
-        const newMessage = new Contact({
+        const newContact = new Contact({
             name,
-            roll: rollNumber,   // FIXED
+            roll,
             email,
             message
         });
 
-        await newMessage.save();
+        await newContact.save();
 
         res.json({ success: true, message: "Message stored successfully!" });
-
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Failed to store message." });
+        res.json({ success: false, message: "Failed to store message" });
     }
 });
 
 
-// GET API — FETCH ALL CONTACT MESSAGES
+// GET API — FETCH ALL MESSAGES
 app.get("/api/contact/messages", async (req, res) => {
     try {
         const messages = await Contact.find().sort({ date: -1 });
         res.json({ success: true, data: messages });
-
     } catch (error) {
         res.json({ success: false, message: "Unable to fetch messages" });
     }
@@ -68,5 +72,5 @@ app.get("/api/contact/messages", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log("API Running on port " + PORT);
+    console.log("Server is running on port " + PORT);
 });
