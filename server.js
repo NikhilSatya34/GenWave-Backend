@@ -64,5 +64,8 @@ app.get("/api/contact/messages", async (req, res) => {
 
 // ===================== START SERVER =====================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("API Running on port " + PORT));
+
+app.listen(PORT, () => {
+    console.log("API Running on port " + PORT);
+});
 
