@@ -8,21 +8,18 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ------------------ ROOT ROUTE (IMPORTANT FOR RENDER) ------------------ //
+// ------------------ TEST ROUTE FOR RENDER ------------------ //
 app.get("/", (req, res) => {
   res.send("GenWave Backend is Running Successfully!");
 });
 
 // ------------------ MONGO DB CONNECTION ------------------ //
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGO_URI;  // Read from Render Environment Variable
 
 mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log("MongoDB Connected Successfully ✔️"))
-  .catch((err) => console.log("❌ MongoDB Connection Error:", err));
+  .connect(mongoURI)
+  .then(() => console.log("MongoDB Connected Successfully"))
+  .catch((err) => console.log("MongoDB Connection Error:", err));
 
 // ------------------ CONTACT SCHEMA ------------------ //
 const contactSchema = new mongoose.Schema({
@@ -51,7 +48,7 @@ app.post("/api/contact", async (req, res) => {
     res.json({ success: true, message: "Message stored successfully!" });
 
   } catch (error) {
-    console.log("❌ Error while saving message:", error);
+    console.log(error);
     res.json({ success: false, message: "Failed to store message" });
   }
 });
@@ -63,7 +60,6 @@ app.get("/api/contact/messages", async (req, res) => {
     res.json({ success: true, data: messages });
 
   } catch (error) {
-    console.log("❌ Error fetching messages:", error);
     res.json({ success: false, message: "Unable to fetch messages" });
   }
 });
@@ -72,5 +68,5 @@ app.get("/api/contact/messages", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("Server running on port " + PORT);
 });
