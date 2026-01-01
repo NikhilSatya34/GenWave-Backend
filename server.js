@@ -37,6 +37,20 @@ app.post("/api/contact", async (req, res) => {
   try {
     const { name, roll, email, message } = req.body;
 
+    // 🔴 DUPLICATE CHECK (10 seconds)
+    const exists = await Contact.findOne({
+      email,
+      message,
+      date: { $gte: new Date(Date.now() - 10000) }
+    });
+
+    if (exists) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate message blocked"
+      });
+    }
+
     const newMessage = new Contact({
       name,
       roll,
